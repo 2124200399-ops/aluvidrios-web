@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AluVidrios | Contacto</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div id="app">
+
+        <!-- NAVBAR-->
+        <nav class="fixed w-full z-50 py-4 px-6 md:px-12 flex justify-between items-center bg-[#0d1b3e] text-white shadow-xl">
+    <div class="flex items-center gap-2">
+        <div class="logo-box">AV</div>
+        <span class="text-2xl font-bold tracking-tighter uppercase">AluVidrios</span>
+    </div>
+    <div class="hidden md:flex gap-8 font-medium text-sm tracking-widest uppercase">
+        <a href="indexcliente.html"     class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Inicio</a>
+        <a href="productoscliente.html" class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Productos</a>
+        <a href="servicioscliente.html" class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Servicios</a>
+        <a href="contactocliente.html"  class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Contacto</a>
+        <a href="pedidos.html"   class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Pedidos</a>
+        <a href="citas.html"   class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Citas
+        </a>
+    </div>
+    <div class="flex items-center gap-5">
+    <div class="relative cursor-pointer" onclick="window.location.href='carrito.html'">
+        <i data-lucide="shopping-cart" style="color:white;"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+    </div>
+        <button onclick="cerrarSesion()" class="btn-login" style="color:white;">Cerrar Sesión</button>
+    </div>
+</nav>
+        
+        <!-- FORMULARIO -->
+        <section id="contacto" class="pt-32 pb-24 px-6 md:px-12 bg-gray-50 min-h-screen flex items-center">
+            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                
+                <div class="space-y-6 animate-up">
+                    <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight" style="color: var(--navy-alu);">
+                        Hablemos de tu <span style="color: var(--cyan-alu);">proyecto</span>
+                    </h2>
+                    <p class="text-gray-600 text-lg max-w-md">
+                        Estamos listos para hacer realidad tus ideas en aluminio y cristal. Déjanos tus datos y un experto se comunicará contigo a la brevedad.
+                    </p>
+                    
+                    <div class="space-y-5 mt-8">
+                        <div class="flex items-center gap-4 text-gray-700">
+                            <div class="p-3 bg-white rounded-full shadow-sm border border-gray-100">
+                                <i data-lucide="map-pin" style="color: var(--cyan-alu);"></i>
+                            </div>
+                            <span class="font-medium">Av. Principal 123, Zona Centro</span>
+                        </div>
+                        <div class="flex items-center gap-4 text-gray-700">
+                            <div class="p-3 bg-white rounded-full shadow-sm border border-gray-100">
+                                <i data-lucide="phone" style="color: var(--cyan-alu);"></i>
+                            </div>
+                            <span class="font-medium">+52 (555) 123-4567</span>
+                        </div>
+                        <div class="flex items-center gap-4 text-gray-700">
+                            <div class="p-3 bg-white rounded-full shadow-sm border border-gray-100">
+                                <i data-lucide="mail" style="color: var(--cyan-alu);"></i>
+                            </div>
+                            <span class="font-medium">contacto@aluvidrios.com</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 md:p-10 rounded-2xl shadow-xl border border-gray-100 animate-up" style="animation-delay: 0.2s;">
+                    <form @submit.prevent="enviarFormulario" class="space-y-5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre</label>
+                                <input type="text" v-model="formulario.nombre" required 
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:border-transparent transition" 
+                                    style="--tw-ring-color: var(--cyan-alu);" placeholder="Tu nombre">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-1">Teléfono</label>
+                                <input type="tel" v-model="formulario.telefono" required 
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:border-transparent transition" 
+                                    style="--tw-ring-color: var(--cyan-alu);" placeholder="Tu teléfono">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Correo Electrónico</label>
+                            <input type="email" v-model="formulario.email" required 
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:border-transparent transition" 
+                                style="--tw-ring-color: var(--cyan-alu);" placeholder="correo@ejemplo.com">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Mensaje</label>
+                            <textarea v-model="formulario.mensaje" required rows="4" 
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:border-transparent transition resize-none" 
+                                style="--tw-ring-color: var(--cyan-alu);" placeholder="¿En qué podemos ayudarte?"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full btn-primary flex justify-center items-center gap-2 mt-2">
+                            <span>Enviar Mensaje</span>
+                            <i data-lucide="send" class="w-5 h-5"></i>
+                        </button>
+
+                        <div v-if="mensajeExito" class="mt-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm text-center font-medium animate-up">
+                            ¡Gracias! Hemos recibido tu mensaje. Nos contactaremos pronto.
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="bg-slate-950 text-gray-400 py-12 px-6">
+            <div class="max-w-7xl mx-auto text-center">
+                <div class="flex justify-center mb-6">
+                    <div class="logo-box">AV</div>
+                </div>
+                <p class="mb-8 italic">"Calidad que se nota, transparencia que enamora."</p>
+                <div class="flex justify-center gap-6 mb-8 text-sm uppercase tracking-widest">
+                    <a href="#" class="hover:text-white">Facebook</a>
+                    <a href="#" class="hover:text-white">Instagram</a>
+                    <a href="#" class="hover:text-white">WhatsApp</a>
+                </div>
+                <p class="text-xs">© 2024 AluVidrios. Todos los derechos reservados.</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script>
+function cerrarSesion() {
+    Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: 'Se cerrará tu sesión de cliente',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#22d3ee',
+        cancelButtonColor: '#475569',
+        confirmButtonText: 'Sí, salir',
+        cancelButtonText: 'Cancelar',
+        background: '#0d1b3e',
+        color: '#ffffff'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.removeItem('usuario');
+            window.location.href = '../index.html';
+        }
+    });
+}
+
+    const { createApp, ref, reactive, onMounted } = Vue;
+    createApp({
+        setup() {
+            const scrolled = ref(false);
+            const mensajeExito = ref(false);
+
+            const formulario = reactive({
+                nombre: '',
+                telefono: '',
+                email: '',
+                mensaje: ''
+            });
+
+            const enviarFormulario = async () => {
+    try {
+        const res = await fetch('http://localhost/aluvidrios/Inicio/api/contacto.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                nombre:   formulario.nombre,
+                telefono: formulario.telefono,
+                correo:   formulario.email,
+                mensaje:  formulario.mensaje
+            })
+        });
+
+        const data = await res.json();
+
+        if (data.ok) {
+            mensajeExito.value = true;
+            formulario.nombre   = '';
+            formulario.telefono = '';
+            formulario.email    = '';
+            formulario.mensaje  = '';
+            setTimeout(() => { mensajeExito.value = false; }, 4000);
+        } else {
+            alert('Error: ' + (data.error || 'No se pudo enviar'));
+        }
+    } catch (err) {
+        alert('Error de conexión con el servidor');
+    }
+};
+
+            onMounted(() => {
+                window.addEventListener('scroll', () => {
+                    scrolled.value = window.scrollY > 50;
+                });
+                lucide.createIcons();
+            });
+
+            return { scrolled, formulario, mensajeExito, enviarFormulario };
+        }
+    }).mount('#app');
+</script>
+</body>
+</html>

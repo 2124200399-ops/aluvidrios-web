@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AluVidrios | Servicios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        /* ── Navbar centrado ── */
+        .nav-wrapper { display:flex; align-items:center; justify-content:space-between; width:100%; position:relative; }
+        .nav-logo    { flex:1; display:flex; align-items:center; gap:10px; }
+        .nav-links   { position:absolute; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:32px; }
+        .nav-actions { flex:1; display:flex; align-items:center; justify-content:flex-end; gap:20px; }
+
+        /* ── Grid de servicios: 4 en fila desktop, 2 en tablet, 1 en mobile ── */
+        .servicios-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 24px;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 8px;
+        }
+        @media (max-width: 1024px) {
+            .servicios-grid { grid-template-columns: repeat(2, 1fr); max-width: 700px; }
+        }
+        @media (max-width: 540px) {
+            .servicios-grid { grid-template-columns: 1fr; max-width: 360px; }
+        }
+
+        /* ── Card ajustada para altura uniforme ── */
+        .servicios-grid .producto-card {
+            width: 100%;
+            flex: unset;
+            height: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .servicios-grid .producto-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .servicios-grid .producto-card h3 {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+
+        <!-- NAVBAR -->
+        <nav :class="{'shadow-xl': scrolled}"
+             class="fixed w-full z-50 transition-all duration-500 py-4 px-6 md:px-12"
+             style="background:#0d1b3e; color:white;">
+
+            <!-- Desktop -->
+            <div class="nav-wrapper hidden md:flex">
+                <div class="nav-logo">
+                    <div class="logo-box">AV</div>
+                    <span class="text-2xl font-bold tracking-tighter uppercase" style="color:white;">AluVidrios</span>
+                </div>
+                <div class="nav-links">
+                    <a href="index.html"     class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm" style="color:white;">Inicio</a>
+                    <a href="productos.html" class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm" style="color:white;">Productos</a>
+                    <a href="servicios.html" class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm" style="color:white;">Servicios</a>
+                    <a href="contacto.html"  class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm" style="color:white;">Contacto</a>
+                </div>
+                <div class="nav-actions">
+                     <div class="flex items-center gap-5">
+                <div class="relative cursor-pointer" onclick="irAlCarrito()">
+    <i data-lucide="shopping-cart" style="color:white;"></i>
+    <span class="cart-badge" id="cartBadge">0</span>
+</div>
+<script>
+    function irAlCarrito() {
+    const usuario = localStorage.getItem('usuario');
+
+    if (!usuario) {
+        Swal.fire({
+            title: '¡Inicia sesión!',
+            text: 'Necesitas iniciar sesión para ver tu carrito.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#22d3ee',
+            cancelButtonColor: '#475569',
+            confirmButtonText: 'Iniciar sesión',
+            cancelButtonText: 'Cancelar',
+            background: '#ffffff',
+            color: '#0d1b3e'
+        }).then(result => {
+            if (result.isConfirmed) {
+                window.location.href = 'is.html';
+            }
+        });
+        return;
+    }
+
+    window.location.href = 'PERFIL CLIENTE/carrito.html';
+}
+</script>
+                    <button onclick="window.location.href='is.html'" class="btn-login" style="color:white;">Acceder</button>
+                </div>
+            </div>
+
+            <!-- Mobile -->
+            <div class="flex md:hidden justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <div class="logo-box">AV</div>
+                    <span class="text-xl font-bold tracking-tighter uppercase" style="color:white;">AluVidrios</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="relative cursor-pointer" id="cartIconMobile" style="color:white;">
+                        <i data-lucide="shopping-cart" style="color:white;"></i>
+                        <span class="cart-badge">0</span>
+                    </div>
+                    <button id="menuBtn" style="color:white; background:none; border:none; cursor:pointer;">
+                        <i data-lucide="menu" style="width:28px; height:28px;"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Menú desplegable mobile -->
+            <div id="menuNav" class="hidden md:hidden flex-col gap-3 pt-4 pb-2 border-t border-slate-700 mt-3">
+                <a href="index.html"     class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Inicio</a>
+                <a href="productos.html" class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Productos</a>
+                <a href="servicios.html" class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Servicios</a>
+                <a href="contacto.html"  class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Contacto</a>
+                <a href="pedidos.html"   class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Pedidos</a>
+                <button onclick="window.location.href='is.html'" class="btn-login mt-2 w-full" style="color:white;">Acceder</button>
+            </div>
+        </nav>
+
+        <!-- SERVICIOS -->
+        <section class="productos-section">
+            <div class="container" style="max-width:1400px; margin:0 auto;">
+                <h2 class="section-title">Nuestros Servicios</h2>
+                <p class="section-subtitle">Ofrecemos soluciones premium en vidrio templado y aluminio para proyectos residenciales y comerciales.</p>
+                <div class="title-underline"></div>
+
+                <div class="servicios-grid">
+
+                    <div class="producto-card">
+                        <img src="Barandal-de-vidrio.jpg" alt="Barandal de vidrio templado">
+                        <h3>Barandal de vidrio templado</h3>
+                        <button class="btn-producto" onclick="window.location.href='agendar.html'">Agendar visita</button>
+                    </div>
+
+                    <div class="producto-card">
+                        <img src="fabricacionVidrio.jpg" alt="Fabricación de Vidrio Templado">
+                        <h3>Fabricación de Vidrio Templado</h3>
+                        <button class="btn-producto" onclick="window.location.href='agendar.html'">Agendar visita</button>
+                    </div>
+
+                    <div class="producto-card">
+                        <img src="cancelBaño.jpg" alt="Canceles de baño">
+                        <h3>Canceles de baño</h3>
+                        <button class="btn-producto" onclick="window.location.href='agendar.html'">Agendar visita</button>
+                    </div>
+
+                    <div class="producto-card">
+                        <img src="fachadaVidrio.jpg" alt="Fachadas Comerciales">
+                        <h3>Fachadas Comerciales de Vidrio Templado</h3>
+                        <button class="btn-producto" onclick="window.location.href='agendar.html'">Agendar visita</button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="bg-slate-950 text-gray-400 py-12 px-6">
+            <div class="max-w-7xl mx-auto text-center">
+                <div class="flex justify-center mb-6">
+                    <div class="logo-box">AV</div>
+                </div>
+                <p class="mb-8 italic">"Calidad que se nota, transparencia que enamora."</p>
+                <div class="flex justify-center gap-6 mb-8 text-sm uppercase tracking-widest">
+                    <a href="#" class="hover:text-white">Facebook</a>
+                    <a href="https://www.instagram.com/aluvidrios_fabricacion?igsh=MW5tbXJiZ2psZTBjZA%3D%3D&utm_source=qr" target="_blank" class="hover:text-white">Instagram</a>
+                    <a href="#" class="hover:text-white">WhatsApp</a>
+                </div>
+                <p class="text-xs">© 2024 AluVidrios. Todos los derechos reservados.</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+        createApp({
+            setup() {
+                const scrolled = ref(false);
+                onMounted(() => {
+                    window.addEventListener('scroll', () => { scrolled.value = window.scrollY > 50; });
+                    lucide.createIcons();
+                });
+                return { scrolled };
+            }
+        }).mount('#app');
+    </script>
+
+    <script>
+        function updateBadge() {
+            const cart  = JSON.parse(localStorage.getItem('cart') || '[]');
+            const total = cart.reduce((s, i) => s + (Number(i.qty) || 1), 0);
+            document.querySelectorAll('.cart-badge').forEach(b => b.textContent = total);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuBtn = document.getElementById('menuBtn');
+            const menuNav = document.getElementById('menuNav');
+            if (menuBtn && menuNav) {
+                menuBtn.addEventListener('click', () => menuNav.classList.toggle('hidden'));
+                menuNav.querySelectorAll('a').forEach(l => l.addEventListener('click', () => menuNav.classList.add('hidden')));
+            }
+            document.getElementById('cartIconDesktop')?.addEventListener('click', () => window.location.href = 'carrito.html');
+            document.getElementById('cartIconMobile')?.addEventListener('click',  () => window.location.href = 'carrito.html');
+            updateBadge();
+        });
+    </script>
+</body>
+</html>

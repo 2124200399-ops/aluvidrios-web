@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AluVidrios | Admin Panel Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .modal-overlay { background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(8px); }
+        .iframe-container { pointer-events: none; }
+        .stat-card { transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-card:hover { transform: translateY(-5px); border-color: rgba(6, 182, 212, 0.4); }
+        input, select { background: #0f172a !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white !important; }
+        input:focus { border-color: #06b6d4 !important; outline: none; }
+        .filter-btn { transition: all 0.2s ease; border: 1px solid rgba(255,255,255,0.08); }
+        .filter-btn.active-asc  { background: rgba(6,182,212,0.15); border-color: rgba(6,182,212,0.5); color: #06b6d4; }
+        .filter-btn.active-desc { background: rgba(239,68,68,0.12); border-color: rgba(239,68,68,0.4); color: #f87171; }
+        .filter-btn:hover:not(.active-asc):not(.active-desc) { background: rgba(255,255,255,0.05); }
+        .stock-bar-wrap { width:60px; height:5px; background:rgba(255,255,255,0.07); border-radius:9999px; overflow:hidden; display:inline-block; vertical-align:middle; margin-left:8px; }
+        .stock-bar-fill { height:100%; border-radius:9999px; transition:width 0.4s ease; }
+        @keyframes rowFadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+        #tabla-productos tr { animation: rowFadeIn 0.25s ease both; }
+    </style>
+</head>
+<body class="bg-[#020617] text-white font-sans">
+    <div class="flex min-h-screen">
+        <aside class="w-64 bg-[#0a0f1d] border-r border-white/5 p-6 fixed h-full z-10">
+            <div class="flex items-center gap-2 mb-10">
+                <div class="bg-cyan-500 text-slate-900 font-bold p-2 rounded shadow-[0_0_15px_rgba(6,182,212,0.5)]">AV</div>
+                <span class="text-xl font-bold tracking-wider text-cyan-50 uppercase">ADMIN</span>
+            </div>
+            <nav class="space-y-2" id="main-nav">
+                <a href="#" class="flex items-center gap-3 p-3 rounded-xl transition text-cyan-400 bg-cyan-400/10" onclick="switchTab('dashboard-home', this)">
+                    <i data-lucide="layout-dashboard"></i> Dashboard
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 rounded-xl transition text-gray-400 hover:bg-white/5" onclick="switchTab('gestion-productos', this)">
+                    <i data-lucide="package"></i> Productos
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 rounded-xl transition text-gray-400 hover:bg-white/5" onclick="switchTab('gestion-citas', this)">
+                    <i data-lucide="calendar"></i> Citas
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 rounded-xl transition text-gray-400 hover:bg-white/5" onclick="switchTab('gestion-pedidos', this)">
+                    <i data-lucide="shopping-cart"></i> Pedidos
+                </a>
+                <a href="#" class="flex items-center gap-3 p-3 rounded-xl transition text-gray-400 hover:bg-red-500/10 hover:text-red-400" onclick="cerrarSesion(event)">
+                    <i data-lucide="log-out"></i> Cerrar sesión
+                </a>
+            </nav>
+        </aside>
+
+        <main class="flex-1 ml-64 p-10">
+            <div id="dashboard-home" class="tab-content">
+                <h1 class="text-3xl font-bold mb-8">Resumen de Actividad</h1>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-10">
+                    <div class="stat-card bg-[#0a0f1d] p-6 rounded-2xl text-center">
+                        <p class="text-gray-500 text-sm">Ventas</p>
+                        <p id="dash-ingresos" class="text-2xl font-bold text-cyan-400">$0.00</p>
+                    </div>
+                    <div class="stat-card bg-[#0a0f1d] p-6 rounded-2xl text-center">
+                        <p class="text-gray-500 text-sm">Productos</p>
+                        <p id="dash-productos" class="text-2xl font-bold">0</p>
+                    </div>
+                    <div class="stat-card bg-[#0a0f1d] p-6 rounded-2xl text-center">
+                        <p class="text-gray-500 text-sm">Citas</p>
+                        <p id="dash-citas" class="text-2xl font-bold">0</p>
+                    </div>
+                    <div class="stat-card bg-[#0a0f1d] p-6 rounded-2xl text-center">
+                        <p class="text-gray-500 text-sm">Pedidos</p>
+                        <p id="dash-pedidos" class="text-2xl font-bold">0</p>
+                    </div>
+                    <div class="stat-card bg-red-500/5 p-6 rounded-2xl text-center border-red-500/20">
+                        <p class="text-red-400 text-sm">Poco Stock</p>
+                        <p id="dash-stock-bajo" class="text-2xl font-bold text-red-400">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PRODUCTOS -->
+            <section id="gestion-productos" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Productos</h2>
+                    <div class="flex items-center gap-3">
+                        <div class="flex items-center gap-2 bg-[#0a0f1d] border border-white/5 rounded-xl px-4 py-2">
+                            <span class="text-gray-500 text-xs uppercase tracking-widest mr-1">Stock</span>
+                            <button id="btn-stock-asc" class="filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-400 font-medium" onclick="sortByStock('asc')">
+                                <i data-lucide="arrow-up" style="width:14px;height:14px"></i> Menor
+                            </button>
+                            <button id="btn-stock-desc" class="filter-btn flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm text-gray-400 font-medium" onclick="sortByStock('desc')">
+                                <i data-lucide="arrow-down" style="width:14px;height:14px"></i> Mayor
+                            </button>
+                            <button id="btn-stock-none" class="filter-btn flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs text-gray-600 hover:text-gray-400" onclick="sortByStock('none')">
+                                <i data-lucide="x" style="width:12px;height:12px"></i>
+                            </button>
+                        </div>
+                        <button onclick="prepararNuevo('modalProducto', 'formProducto')" class="bg-cyan-500 text-slate-900 px-6 py-2 rounded-xl font-bold flex items-center gap-2">
+                            <i data-lucide="plus"></i> Nuevo
+                        </button>
+                    </div>
+                </div>
+                <div id="sort-badge" class="hidden mb-4 flex items-center gap-2 text-sm">
+                    <span id="sort-badge-text" class="px-3 py-1 rounded-full font-semibold"></span>
+                    <span class="text-gray-600 text-xs">· haz clic en <strong class="text-gray-400">✕</strong> para quitar el orden</span>
+                </div>
+                <div class="bg-[#0a0f1d] border border-white/5 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-white/5 text-gray-400 text-xs uppercase tracking-widest">
+                            <tr>
+                                <th class="px-6 py-4">3D</th>
+                                <th class="px-6 py-4">Nombre</th>
+                                <th class="px-6 py-4">Precio</th>
+                                <th class="px-6 py-4 cursor-pointer select-none" onclick="toggleStockSort()">
+                                    <div class="flex items-center gap-1">Unidades <i data-lucide="chevrons-up-down" style="width:14px;height:14px;opacity:0.5"></i></div>
+                                </th>
+                                <th class="px-6 py-4 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-productos" class="divide-y divide-white/5"></tbody>
+                    </table>
+                    <div id="productos-empty" class="hidden py-16 text-center text-gray-600">
+                        <i data-lucide="package-open" class="mx-auto mb-3" style="width:36px;height:36px;opacity:0.3"></i>
+                        <p class="text-sm">No hay productos. ¡Agrega el primero!</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CITAS -->
+            <section id="gestion-citas" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Citas</h2>
+                    <button onclick="prepararNuevo('modalCita', 'formCita')" class="bg-cyan-500 text-slate-900 px-6 py-2 rounded-xl font-bold flex items-center gap-2">
+                        <i data-lucide="plus"></i> Nueva Cita
+                    </button>
+                </div>
+                <div class="bg-[#0a0f1d] border border-white/5 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-white/5 text-gray-400 text-xs uppercase tracking-widest">
+                            <tr><th class="px-6 py-4">Cliente</th><th class="px-6 py-4">Fecha/Hora</th><th class="px-6 py-4">Estado</th><th class="px-6 py-4 text-center">Acciones</th></tr>
+                        </thead>
+                        <tbody id="tabla-citas" class="divide-y divide-white/5"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- PEDIDOS -->
+            <section id="gestion-pedidos" class="tab-content hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Pedidos</h2>
+                    <button onclick="prepararNuevo('modalPedido', 'formPedido')" class="bg-cyan-500 text-slate-900 px-6 py-2 rounded-xl font-bold flex items-center gap-2">
+                        <i data-lucide="plus"></i> Nuevo Pedido
+                    </button>
+                </div>
+                <div class="bg-[#0a0f1d] border border-white/5 rounded-2xl overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-white/5 text-gray-400 text-xs uppercase tracking-widest">
+                            <tr><th class="px-6 py-4">ID</th><th class="px-6 py-4">Cliente</th><th class="px-6 py-4">Total</th><th class="px-6 py-4">Estado</th><th class="px-6 py-4 text-center">Acciones</th></tr>
+                        </thead>
+                        <tbody id="tabla-pedidos" class="divide-y divide-white/5"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODAL PRODUCTO -->
+    <div id="modalProducto" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[#0a1120] border border-white/10 w-full max-w-md rounded-2xl p-8">
+            <h3 class="text-xl font-bold mb-6 text-cyan-400" id="title-modalProducto">Nuevo Registro</h3>
+            <form id="formProducto" class="space-y-4">
+                <input type="text" id="pNombre" placeholder="Nombre" required class="w-full p-3 rounded-xl">
+                <input type="number" id="pPrecio" placeholder="Precio USD" required class="w-full p-3 rounded-xl">
+                <input type="number" id="pUnidades" placeholder="Unidades en stock" required min="0" class="w-full p-3 rounded-xl">
+                <div class="flex gap-2">
+                    <input type="text" id="pUrl" placeholder="ID Sketchfab" required class="flex-1 p-3 rounded-xl">
+                    <label class="cursor-pointer bg-white/5 hover:bg-white/10 p-3 rounded-xl border border-white/10 flex items-center">
+                        <i data-lucide="folder-open" class="text-cyan-400"></i>
+                        <input type="file" id="filePicker" class="hidden" accept=".obj,.fbx,.gltf,.zip">
+                    </label>
+                </div>
+                <p id="fileNameDisplay" class="text-[10px] text-cyan-500/60"></p>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModal('modalProducto')" class="flex-1 py-3 border border-white/10 rounded-xl">Cancelar</button>
+                    <button type="submit" class="flex-1 py-3 bg-cyan-500 text-slate-900 font-bold rounded-xl">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL CITA -->
+    <div id="modalCita" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[#0a1120] border border-white/10 w-full max-w-md rounded-2xl p-8">
+            <h3 class="text-xl font-bold mb-6 text-cyan-400" id="title-modalCita">Agendar Cita</h3>
+            <form id="formCita" class="space-y-4">
+                <input type="text" id="cNombre" placeholder="Cliente" required class="w-full p-3 rounded-xl">
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="date" id="cFecha" required class="w-full p-3 rounded-xl">
+                    <input type="time" id="cHora" required class="w-full p-3 rounded-xl">
+                </div>
+                <select id="cEstado" class="w-full p-3 rounded-xl">
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Confirmada">Confirmada</option>
+                </select>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModal('modalCita')" class="flex-1 py-3 border border-white/10 rounded-xl">Cancelar</button>
+                    <button type="submit" class="flex-1 py-3 bg-cyan-500 text-slate-900 font-bold rounded-xl">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL PEDIDO -->
+    <div id="modalPedido" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[#0a1120] border border-white/10 w-full max-w-2xl rounded-2xl p-8 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold mb-6 text-cyan-400" id="title-modalPedido">Nuevo Pedido</h3>
+            <form id="formPedido" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="pedNombre" placeholder="Nombre del Cliente" required class="w-full p-3 rounded-xl">
+                    <select id="pedProductoSelect" class="w-full p-3 rounded-xl">
+                        <option value="">-- Selecciona un producto --</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" id="pedCantidad" placeholder="Cantidad" min="1" class="w-full p-3 rounded-xl">
+                    <button type="button" onclick="agregarProductoAlPedido()" class="bg-cyan-500 text-slate-900 px-6 py-3 rounded-xl font-bold">Agregar Producto</button>
+                </div>
+                <div class="bg-white/5 p-4 rounded-xl border border-white/10">
+                    <p class="text-sm text-gray-400 mb-3">Productos en el pedido:</p>
+                    <div id="lista-productos-pedido" class="text-sm space-y-2"></div>
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button type="button" onclick="closeModal('modalPedido')" class="flex-1 py-3 border border-white/10 rounded-xl">Cancelar</button>
+                    <button type="submit" id="btn-guardar-pedido" class="flex-1 py-3 bg-cyan-500 text-slate-900 font-bold rounded-xl">Guardar Pedido</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE PEDIDO -->
+    <div id="modalDetallePedido" class="fixed inset-0 modal-overlay hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-[#0a1120] border border-white/10 w-full max-w-2xl rounded-2xl p-8 max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold mb-6 text-cyan-400">Detalle del Pedido <span id="detail-pedido-id" class="text-cyan-500"></span></h3>
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div><p class="text-gray-400 text-sm">Cliente</p><p id="detail-cliente" class="text-lg font-semibold"></p></div>
+                    <div><p class="text-gray-400 text-sm">Total</p><p id="detail-total" class="text-lg font-bold text-cyan-400"></p></div>
+                </div>
+                <div>
+                    <p class="text-gray-400 text-sm mb-3">Productos del Pedido</p>
+                    <table class="w-full text-sm">
+                        <thead class="bg-white/5 text-gray-400 text-xs uppercase">
+                            <tr><th class="px-3 py-2 text-left">Producto</th><th class="px-3 py-2 text-center">Cantidad</th><th class="px-3 py-2 text-right">Subtotal</th></tr>
+                        </thead>
+                        <tbody id="detail-productos" class="divide-y divide-white/10"></tbody>
+                    </table>
+                </div>
+                <div class="border-t border-white/10 pt-4">
+                    <p class="text-gray-400 text-sm mb-3">Estado del Pedido</p>
+                    <select id="detail-estado" class="w-full p-3 rounded-xl">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="pagado">Pagado</option>
+                        <option value="enviado">Enviado</option>
+                        <option value="completado">Completado</option>
+                        <option value="cancelado">Cancelado</option>
+                    </select>
+                </div>
+                <div class="flex gap-3 pt-6">
+                    <button type="button" onclick="closeModal('modalDetallePedido')" class="flex-1 py-3 border border-white/10 rounded-xl">Cerrar</button>
+                    <button type="button" onclick="guardarCambiosPedido()" class="flex-1 py-3 bg-cyan-500 text-slate-900 font-bold rounded-xl">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let editRow = null;
+        let pedidosData = {};
+        let productosTempPedido = [];
+        let pedidoActual = null;
+        let currentSort = 'none';
+
+        // ── Ruta a tu API ──────────────────────────────
+        // admin.html está en: Inicio/PERFIL ADMIN/
+        // guardar_pedido.php está en: Inicio/api/
+        const API_GUARDAR = '../api/guardar_pedido.php';
+
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('#main-nav a').forEach(a => a.classList.remove('text-cyan-400', 'bg-cyan-400/10'));
+            btn.classList.add('text-cyan-400', 'bg-cyan-400/10');
+        }
+        function openModal(id)  { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); editRow = null; document.getElementById('fileNameDisplay').innerText = ''; }
+
+        function prepararNuevo(modalId, formId) {
+            editRow = null;
+            document.getElementById(formId).reset();
+            document.getElementById('title-' + modalId).innerText = "Nuevo Registro";
+            if (modalId === 'modalPedido') {
+                productosTempPedido = [];
+                document.getElementById('lista-productos-pedido').innerHTML = '';
+                document.getElementById('pedProductoSelect').innerHTML = '<option value="">-- Selecciona un producto --</option>';
+                cargarSelectProductos();
+            }
+            openModal(modalId);
+        }
+
+        document.getElementById('filePicker').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('fileNameDisplay').innerText = `📂 Archivo: ${file.name}`;
+                document.getElementById('pNombre').value = file.name.split('.')[0].replace(/_/g, ' ').replace(/-/g, ' ');
+            }
+        });
+
+        function toggleStockSort() {
+            if (currentSort === 'none' || currentSort === 'desc') sortByStock('asc');
+            else sortByStock('desc');
+        }
+        function sortByStock(dir) {
+            currentSort = dir;
+            const btnAsc  = document.getElementById('btn-stock-asc');
+            const btnDesc = document.getElementById('btn-stock-desc');
+            btnAsc.classList.remove('active-asc', 'active-desc');
+            btnDesc.classList.remove('active-asc', 'active-desc');
+            const badge = document.getElementById('sort-badge');
+            const badgeText = document.getElementById('sort-badge-text');
+            if (dir === 'none') { badge.classList.add('hidden'); lucide.createIcons(); return; }
+            if (dir === 'asc') {
+                btnAsc.classList.add('active-asc');
+                badgeText.className = 'px-3 py-1 rounded-full font-semibold text-xs bg-cyan-500/15 text-cyan-400 border border-cyan-500/30';
+                badgeText.innerHTML = '↑ Ordenado: Menor stock primero';
+            } else {
+                btnDesc.classList.add('active-desc');
+                badgeText.className = 'px-3 py-1 rounded-full font-semibold text-xs bg-red-500/15 text-red-400 border border-red-500/30';
+                badgeText.innerHTML = '↓ Ordenado: Mayor stock primero';
+            }
+            badge.classList.remove('hidden');
+            const tbody = document.getElementById('tabla-productos');
+            const rows  = Array.from(tbody.querySelectorAll('tr'));
+            rows.sort((a, b) => { const ua = parseInt(a.cells[3].innerText)||0, ub = parseInt(b.cells[3].innerText)||0; return dir==='asc' ? ua-ub : ub-ua; });
+            rows.forEach(r => { r.style.animation='none'; tbody.appendChild(r); r.offsetHeight; r.style.animation=''; });
+            lucide.createIcons();
+        }
+
+        function getStockBar(unidades) {
+            const u = parseInt(unidades);
+            const pct = Math.min(100, Math.round((u / 100) * 100));
+            const color = u===0 ? '#ef4444' : u<5 ? '#f97316' : u<15 ? '#eab308' : '#06b6d4';
+            return `<span class="stock-bar-wrap"><span class="stock-bar-fill" style="width:${pct}%;background:${color}"></span></span>`;
+        }
+
+        document.getElementById('formProducto').onsubmit = (e) => {
+            e.preventDefault();
+            const nombre=document.getElementById('pNombre').value, precio=document.getElementById('pPrecio').value;
+            const unidades=document.getElementById('pUnidades').value, id3d=document.getElementById('pUrl').value;
+            const embed=`https://sketchfab.com/models/${id3d}/embed?autostart=1&autospin=1&transparent=1&ui_infos=0&ui_controls=0`;
+            const esStockBajo = parseInt(unidades) < 5;
+            const stockLabel  = esStockBajo ? `<span class="text-red-400 font-semibold">${unidades}</span>` : `<span class="text-white font-semibold">${unidades}</span>`;
+            const html = `
+            <td class="px-6 py-4"><div class="w-40 h-28 bg-black rounded-xl border border-white/10 overflow-hidden iframe-container shadow-lg shadow-cyan-500/10"><iframe class="w-full h-full" src="${embed}" frameborder="0" allow="autoplay; fullscreen; vr"></iframe></div></td>
+            <td class="px-6 py-4 font-medium text-lg">${nombre}</td>
+            <td class="px-6 py-4 text-cyan-400 font-bold text-lg">$${parseFloat(precio).toLocaleString()}</td>
+            <td class="px-6 py-4"><div class="flex items-center gap-2">${stockLabel}${getStockBar(unidades)}</div></td>
+            <td class="px-6 py-4 text-center"><div class="flex justify-center gap-3">
+                <button onclick="editProducto(this)" class="text-gray-400 hover:text-cyan-400"><i data-lucide="edit-3" style="width:20px"></i></button>
+                <button onclick="this.closest('tr').remove();updateDashboard();checkEmpty();" class="text-gray-400 hover:text-red-400"><i data-lucide="trash-2" style="width:20px"></i></button>
+            </div></td>`;
+            const trClass = esStockBajo ? 'bg-red-500/10 hover:bg-red-500/20 border-red-500/20' : 'hover:bg-white/[0.02]';
+            if (editRow) { editRow.innerHTML=html; editRow.className=`${trClass} border-b border-white/5`; }
+            else document.getElementById('tabla-productos').insertAdjacentHTML('beforeend', `<tr class="${trClass} border-b border-white/5">${html}</tr>`);
+            closeModal('modalProducto'); updateDashboard(); checkEmpty(); lucide.createIcons();
+        };
+
+        function editProducto(btn) {
+            editRow = btn.closest('tr');
+            document.getElementById('pNombre').value   = editRow.cells[1].innerText;
+            document.getElementById('pPrecio').value   = editRow.cells[2].innerText.replace('$','').replace(',','');
+            document.getElementById('pUnidades').value = parseInt(editRow.cells[3].innerText) || 0;
+            const url = editRow.cells[0].querySelector('iframe').src;
+            document.getElementById('pUrl').value = url.split('/models/')[1].split('/embed')[0];
+            document.getElementById('title-modalProducto').innerText = "Editar Producto";
+            openModal('modalProducto');
+        }
+        function checkEmpty() {
+            document.getElementById('productos-empty').classList.toggle('hidden', document.querySelectorAll('#tabla-productos tr').length > 0);
+        }
+
+        document.getElementById('formCita').onsubmit = (e) => {
+            e.preventDefault();
+            const nom=document.getElementById('cNombre').value, fec=document.getElementById('cFecha').value;
+            const hor=document.getElementById('cHora').value,   est=document.getElementById('cEstado').value;
+            const color = est==='Confirmada' ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400';
+            const html = `
+                <td class="px-6 py-4">${nom}</td><td class="px-6 py-4 text-gray-500">${fec} | ${hor}</td>
+                <td class="px-6 py-4"><span class="${color} px-3 py-1 rounded-full text-[10px] font-bold uppercase">${est}</span></td>
+                <td class="px-6 py-4 text-center"><div class="flex justify-center gap-3">
+                    <button onclick="editCita(this)" class="text-gray-400 hover:text-cyan-400"><i data-lucide="edit-3" style="width:18px"></i></button>
+                    <button onclick="this.closest('tr').remove();updateDashboard();" class="text-gray-400 hover:text-red-400"><i data-lucide="trash-2" style="width:18px"></i></button>
+                </div></td>`;
+            if (editRow) editRow.innerHTML = html;
+            else document.getElementById('tabla-citas').insertAdjacentHTML('beforeend', `<tr class="hover:bg-white/[0.02] border-b border-white/5">${html}</tr>`);
+            closeModal('modalCita'); updateDashboard(); lucide.createIcons();
+        };
+        function editCita(btn) {
+            editRow = btn.closest('tr');
+            document.getElementById('cNombre').value = editRow.cells[0].innerText;
+            const [f,h] = editRow.cells[1].innerText.split(' | ');
+            document.getElementById('cFecha').value=f; document.getElementById('cHora').value=h;
+            document.getElementById('cEstado').value = editRow.cells[2].innerText.trim();
+            document.getElementById('title-modalCita').innerText = "Editar Cita";
+            openModal('modalCita');
+        }
+
+        function cargarSelectProductos() {
+            const select = document.getElementById('pedProductoSelect');
+            document.querySelectorAll('#tabla-productos tr').forEach(row => {
+                const nombre = row.cells[1].innerText;
+                const precio = parseFloat(row.cells[2].innerText.replace('$','').replace(',',''));
+                const option = document.createElement('option');
+                option.value = JSON.stringify({nombre, precio});
+                option.textContent = `${nombre} - $${precio.toLocaleString()}`;
+                select.appendChild(option);
+            });
+        }
+        function agregarProductoAlPedido() {
+            const select   = document.getElementById('pedProductoSelect');
+            const cantidad = parseInt(document.getElementById('pedCantidad').value);
+            if (!select.value || !cantidad || cantidad < 1) { alert('Selecciona un producto y cantidad válida'); return; }
+            const {nombre, precio} = JSON.parse(select.value);
+            productosTempPedido.push({nombre, precio, cantidad, subtotal: precio*cantidad});
+            renderListaPedido();
+            select.value=''; document.getElementById('pedCantidad').value='';
+        }
+        function renderListaPedido() {
+            document.getElementById('lista-productos-pedido').innerHTML = '';
+            productosTempPedido.forEach(p => {
+                document.getElementById('lista-productos-pedido').insertAdjacentHTML('beforeend', `
+                <div class="flex justify-between items-center bg-white/5 p-2 rounded border border-white/10">
+                    <span>${p.nombre} x${p.cantidad}</span>
+                    <div class="flex items-center gap-3">
+                        <span class="text-cyan-400">$${p.subtotal.toLocaleString()}</span>
+                        <button type="button" onclick="eliminarProductoDePedido('${p.nombre}')" class="text-red-400 hover:text-red-300 text-xs"><i data-lucide="trash-2" style="width:16px"></i></button>
+                    </div>
+                </div>`);
+            });
+            lucide.createIcons();
+        }
+        function eliminarProductoDePedido(nombre) {
+            productosTempPedido = productosTempPedido.filter(p => p.nombre !== nombre);
+            renderListaPedido();
+        }
+
+        // ── GUARDAR PEDIDO → llama a guardar_pedido.php ──
+        document.getElementById('formPedido').onsubmit = async (e) => {
+            e.preventDefault();
+            if (productosTempPedido.length === 0) {
+                Swal.fire({title:'Sin productos', text:'Agrega al menos un producto', icon:'warning', background:'#0a0f1d', color:'#fff', confirmButtonColor:'#06b6d4'});
+                return;
+            }
+
+            const nom   = document.getElementById('pedNombre').value;
+            const total = productosTempPedido.reduce((sum, p) => sum + p.subtotal, 0);
+
+            const payload = {
+                cliente:         nom,
+                total:           total,
+                estado:          'pendiente',
+                direccion_envio: '',
+                productos:       productosTempPedido,
+                id_usuario:      1    // cambia si tienes sistema de login
+            };
+
+            const btn = document.getElementById('btn-guardar-pedido');
+            btn.disabled = true;
+            btn.innerText = 'Guardando…';
+
+            try {
+                const res  = await fetch(API_GUARDAR, {
+                    method:  'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body:    JSON.stringify(payload)
+                });
+                const json = await res.json();
+                if (!json.ok) throw new Error(json.error);
+
+                // Agregar fila a la tabla con el ID real de MySQL
+                const idMostrar = `#${json.id_pedido}`;
+                pedidosData[idMostrar] = {id: idMostrar, cliente: nom, total, estado: 'pendiente', productos: [...productosTempPedido]};
+
+                const html = `
+                    <td class="px-6 py-4 text-cyan-500 font-mono cursor-pointer hover:text-cyan-300" onclick="verDetallePedido('${idMostrar}')">${idMostrar}</td>
+                    <td class="px-6 py-4">${nom}</td>
+                    <td class="px-6 py-4 font-bold">$${total.toLocaleString()}</td>
+                    <td class="px-6 py-4"><span class="bg-yellow-500/10 text-yellow-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase">pendiente</span></td>
+                    <td class="px-6 py-4 text-center"><div class="flex justify-center gap-3">
+                        <button onclick="verDetallePedido('${idMostrar}')" class="text-gray-400 hover:text-cyan-400"><i data-lucide="eye" style="width:18px"></i></button>
+                        <button onclick="eliminarPedido(this,'${idMostrar}')" class="text-gray-400 hover:text-red-400"><i data-lucide="trash-2" style="width:18px"></i></button>
+                    </div></td>`;
+                document.getElementById('tabla-pedidos').insertAdjacentHTML('beforeend', `<tr class="hover:bg-white/[0.02] border-b border-white/5">${html}</tr>`);
+
+                descontarStock(productosTempPedido);
+                closeModal('modalPedido');
+                updateDashboard();
+                lucide.createIcons();
+                productosTempPedido = [];
+                document.getElementById('lista-productos-pedido').innerHTML = '';
+
+                Swal.fire({title:'¡Pedido guardado!', text:`ID asignado: ${idMostrar}`, icon:'success', background:'#0a0f1d', color:'#fff', confirmButtonColor:'#06b6d4', timer:2500, showConfirmButton:false});
+
+            } catch (err) {
+                Swal.fire({title:'Error al guardar', text: err.message, icon:'error', background:'#0a0f1d', color:'#fff', confirmButtonColor:'#06b6d4'});
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'Guardar Pedido';
+            }
+        };
+
+        function descontarStock(productosDelPedido) {
+            document.querySelectorAll('#tabla-productos tr').forEach(row => {
+                const nombreFila = row.cells[1].innerText.trim();
+                const match = productosDelPedido.find(p => p.nombre.trim() === nombreFila);
+                if (!match) return;
+                const celdaStock = row.cells[3];
+                const actuales = parseInt(celdaStock.querySelector('span')?.innerText) || 0;
+                const nuevas   = Math.max(0, actuales - match.cantidad);
+                const esBajo   = nuevas < 5;
+                const lbl = esBajo ? `<span class="text-red-400 font-semibold">${nuevas}</span>` : `<span class="text-white font-semibold">${nuevas}</span>`;
+                celdaStock.innerHTML = `<div class="flex items-center gap-2">${lbl}${getStockBar(nuevas)}</div>`;
+                row.className = esBajo ? 'bg-red-500/10 hover:bg-red-500/20 border-red-500/20 border-b border-white/5' : 'hover:bg-white/[0.02] border-b border-white/5';
+                celdaStock.style.transition = 'background 0.3s';
+                celdaStock.style.background = esBajo ? 'rgba(239,68,68,0.2)' : 'rgba(6,182,212,0.15)';
+                setTimeout(() => { celdaStock.style.background = ''; }, 700);
+            });
+            updateDashboard();
+        }
+
+        function verDetallePedido(id) {
+            pedidoActual = id;
+            const pedido = pedidosData[id];
+            if (!pedido) return;
+            document.getElementById('detail-pedido-id').innerText = id;
+            document.getElementById('detail-cliente').innerText   = pedido.cliente;
+            document.getElementById('detail-total').innerText     = `$${pedido.total.toLocaleString()}`;
+            document.getElementById('detail-estado').value        = pedido.estado;
+            let html = '';
+            pedido.productos.forEach(p => {
+                html += `<tr><td class="px-3 py-2">${p.nombre}</td><td class="px-3 py-2 text-center">${p.cantidad}</td><td class="px-3 py-2 text-right">$${p.subtotal.toLocaleString()}</td></tr>`;
+            });
+            document.getElementById('detail-productos').innerHTML = html;
+            openModal('modalDetallePedido');
+        }
+        function guardarCambiosPedido() {
+            if (!pedidoActual) return;
+            pedidosData[pedidoActual].estado = document.getElementById('detail-estado').value;
+            document.querySelectorAll('#tabla-pedidos tr').forEach(row => {
+                if (row.cells[0].innerText === pedidoActual) {
+                    row.cells[3].innerHTML = `<span class="bg-yellow-500/10 text-yellow-400 px-3 py-1 rounded-full text-[10px] font-bold uppercase">${pedidosData[pedidoActual].estado}</span>`;
+                }
+            });
+            closeModal('modalDetallePedido');
+            lucide.createIcons();
+        }
+        function eliminarPedido(btn, id) {
+            btn.closest('tr').remove();
+            delete pedidosData[id];
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            document.getElementById('dash-productos').innerText = document.querySelectorAll('#tabla-productos tr').length;
+            document.getElementById('dash-citas').innerText     = document.querySelectorAll('#tabla-citas tr').length;
+            document.getElementById('dash-pedidos').innerText   = document.querySelectorAll('#tabla-pedidos tr').length;
+            let sum = 0;
+            document.querySelectorAll('#tabla-pedidos tr').forEach(r => sum += parseFloat(r.cells[2].innerText.replace('$','').replace(',','')) || 0);
+            document.getElementById('dash-ingresos').innerText = `$${sum.toLocaleString()}`;
+            let stockBajo = 0;
+            document.querySelectorAll('#tabla-productos tr').forEach(r => { if ((parseInt(r.cells[3].innerText)||0) < 5) stockBajo++; });
+            document.getElementById('dash-stock-bajo').innerText = stockBajo;
+        }
+
+        function cerrarSesion(e) {
+            e.preventDefault();
+            Swal.fire({title:'¿Cerrar sesión?', text:'Se cerrará tu sesión de administrador', icon:'warning', showCancelButton:true, confirmButtonColor:'#06b6d4', cancelButtonColor:'#475569', confirmButtonText:'Sí, salir', cancelButtonText:'Cancelar', background:'#0a0f1d', color:'#ffffff'})
+            .then(result => { if (result.isConfirmed) window.location.href = '../index.html'; });
+        }
+    </script>
+</body>
+</html>

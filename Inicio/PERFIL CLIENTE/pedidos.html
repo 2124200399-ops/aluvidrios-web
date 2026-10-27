@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AluVidrios | Pedidos</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    body { background:#0b1226; font-family:'Segoe UI',sans-serif; }
+    .logo-box { background:linear-gradient(135deg,#06b6d4,#3b82f6); color:#fff; font-weight:900; padding:6px 10px; border-radius:8px; font-size:14px; }
+    .btn-login { border:2px solid #06b6d4; color:#06b6d4 !important; background:transparent; padding:6px 18px; border-radius:8px; font-weight:700; cursor:pointer; transition:.2s; }
+    .btn-login:hover { background:#06b6d4; color:#fff !important; }
+    .cart-badge { position:absolute; top:-8px; right:-10px; background:#ef4444; color:#fff; border-radius:999px; font-size:11px; font-weight:800; padding:1px 6px; }
+    .btn-secondary { background:#f1f5f9; color:#334155; border:1px solid #cbd5e1; border-radius:8px; font-weight:700; font-size:13px; cursor:pointer; transition:.2s; }
+    .btn-secondary:hover { background:#e2e8f0; }
+
+    /* ── Navbar centrado ── */
+    .nav-wrapper { display:flex; align-items:center; justify-content:space-between; width:100%; position:relative; }
+    .nav-logo    { flex:1; display:flex; align-items:center; gap:10px; }
+    .nav-links   { position:absolute; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:32px; }
+    .nav-actions { flex:1; display:flex; align-items:center; justify-content:flex-end; gap:20px; }
+
+    .page-wrap { padding-top:110px; padding-left:16px; padding-right:16px; padding-bottom:64px; min-height:100vh; }
+    .card { max-width:1100px; margin:0 auto; background:#fff; border-radius:16px; padding:24px; box-shadow:0 24px 70px rgba(0,0,0,.35); }
+
+    .table { width:100%; border-collapse:collapse; }
+    .table th, .table td { padding:13px 14px; border-bottom:1px solid #e2e8f0; text-align:left; font-size:14px; }
+    .table th { background:#f1f5f9; font-weight:800; color:#0f172a; }
+    .table tr:last-child td { border-bottom:none; }
+    .table tr:hover td { background:#f8fafc; }
+
+    .badge { display:inline-block; padding:4px 12px; border-radius:999px; font-weight:800; font-size:12px; white-space:nowrap; }
+    .badge.pendiente  { background:rgba(245,158,11,.15); color:#b45309; }
+    .badge.pagado     { background:rgba(34,197,94,.15);  color:#15803d; }
+    .badge.en-proceso { background:rgba(59,130,246,.15); color:#1d4ed8; }
+    .badge.deuda      { background:rgba(239,68,68,.15);  color:#b91c1c; }
+
+    .status-select { border:2px solid #e2e8f0; border-radius:8px; padding:5px 10px; font-size:13px; font-weight:700; cursor:pointer; outline:none; transition:border-color .2s; background:#f8fafc; color:#0f172a; min-width:140px; }
+    .status-select:focus { border-color:#06b6d4; }
+    .status-select.pagado     { background:rgba(34,197,94,.1);  color:#15803d; border-color:#86efac; }
+    .status-select.en-proceso { background:rgba(59,130,246,.1); color:#1d4ed8; border-color:#93c5fd; }
+    .status-select.deuda      { background:rgba(239,68,68,.1);  color:#b91c1c; border-color:#fca5a5; }
+    .status-select.pendiente  { background:rgba(245,158,11,.1); color:#b45309; border-color:#fcd34d; }
+
+    .detail-list { font-size:12px; color:#64748b; margin-top:4px; }
+    .btn-del { background:none; border:none; cursor:pointer; color:#ef4444; padding:4px 8px; border-radius:6px; font-size:13px; font-weight:700; transition:.2s; }
+    .btn-del:hover { background:#fee2e2; }
+    .empty { padding:32px; border:1px dashed #94a3b8; border-radius:12px; color:#475569; text-align:center; font-size:1rem; }
+  </style>
+</head>
+
+<body>
+  <div id="app">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 py-4 px-6 md:px-12 flex justify-between items-center bg-[#0d1b3e] text-white shadow-xl">
+    <div class="flex items-center gap-2">
+        <div class="logo-box">AV</div>
+        <span class="text-2xl font-bold tracking-tighter uppercase">AluVidrios</span>
+    </div>
+    <div class="hidden md:flex gap-8 font-medium text-sm tracking-widest uppercase">
+        <a href="indexcliente.html"     class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Inicio</a>
+        <a href="productoscliente.html" class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Productos</a>
+        <a href="servicioscliente.html" class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Servicios</a>
+        <a href="contactocliente.html"  class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Contacto</a>
+        <a href="pedidos.html"   class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Pedidos</a>
+        <a href="citas.html"   class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Citas
+        </a>
+    </div>
+    <div class="flex items-center gap-5">
+    <div class="relative cursor-pointer" onclick="window.location.href='carrito.html'">
+        <i data-lucide="shopping-cart" style="color:white;"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+    </div>
+        <button onclick="cerrarSesion()" class="btn-login" style="color:white;">Cerrar Sesión</button>
+    </div>
+</nav>
+
+    <!-- CONTENIDO -->
+    <main class="page-wrap">
+      <div class="card">
+        <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-6">
+          <div>
+            <h1 class="text-3xl font-extrabold text-slate-900">Mis pedidos</h1>
+            <p class="text-slate-500 text-sm mt-1">Administra el estado de tus pedidos.</p>
+          </div>
+          <button id="clearOrders" class="btn-secondary" style="padding:10px 18px; color:#b91c1c;">
+            🗑 Borrar todo
+          </button>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; align-items:center;">
+          <span class="badge pagado">Pagado</span>
+          <span class="badge en-proceso">En proceso</span>
+          <span class="badge deuda">Deuda</span>
+          <span class="badge pendiente">Pendiente</span>
+          <span style="font-size:12px; color:#94a3b8; margin-left:4px;">← Cambia el estado desde el selector</span>
+        </div>
+
+        <div id="ordersRoot"></div>
+      </div>
+    </main>
+
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script>
+    const { createApp, ref, onMounted } = Vue;
+    createApp({
+      setup() {
+        const scrolled = ref(false);
+        onMounted(() => {
+          window.addEventListener('scroll', () => { scrolled.value = window.scrollY > 50; });
+          lucide.createIcons();
+        });
+        return { scrolled };
+      }
+    }).mount('#app');
+  </script>
+
+  <script>
+function cerrarSesion() {
+    Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: 'Se cerrará tu sesión de cliente',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#22d3ee',
+        cancelButtonColor: '#475569',
+        confirmButtonText: 'Sí, salir',
+        cancelButtonText: 'Cancelar',
+        background: '#0d1b3e',
+        color: '#ffffff'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            localStorage.removeItem('usuario');
+            window.location.href = '../index.html';
+        }
+    });
+}
+
+    const ORDERS_KEY = 'orders';
+
+    function getOrders() {
+      try { return JSON.parse(localStorage.getItem(ORDERS_KEY)) || []; } catch { return []; }
+    }
+    function saveOrders(orders) { localStorage.setItem(ORDERS_KEY, JSON.stringify(orders)); }
+
+    function updateBadge() {
+      const cart  = JSON.parse(localStorage.getItem('cart') || '[]');
+      const total = cart.reduce((s, i) => s + (Number(i.qty) || 1), 0);
+      document.querySelectorAll('.cart-badge').forEach(b => b.textContent = total);
+    }
+
+    function formatMXN(value) {
+      const n = Number.isFinite(+value) ? +value : 0;
+      return n.toLocaleString('es-MX', { style:'currency', currency:'MXN' });
+    }
+    function formatDate(iso) {
+      const d = new Date(iso);
+      if (isNaN(d)) return String(iso || '');
+      return d.toLocaleDateString('es-MX', { year:'numeric', month:'2-digit', day:'2-digit' });
+    }
+    function statusClass(status) {
+      const s = String(status || '').toLowerCase();
+      if (s.includes('pagado'))  return 'pagado';
+      if (s.includes('proceso')) return 'en-proceso';
+      if (s.includes('deuda'))   return 'deuda';
+      return 'pendiente';
+    }
+
+    function changeStatus(index, newStatus) {
+      const orders = getOrders();
+      if (!orders[index]) return;
+      orders[index].status = newStatus;
+      saveOrders(orders);
+      const sel = document.querySelector(`[data-order-index="${index}"]`);
+      if (sel) sel.className = `status-select ${statusClass(newStatus)}`;
+    }
+
+    function deleteOrder(index) {
+      Swal.fire({
+        title: '¿Eliminar pedido?', text: 'Esta acción no se puede deshacer.', icon: 'warning',
+        showCancelButton: true, confirmButtonText: 'Sí, eliminar', cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b',
+      }).then(r => {
+        if (r.isConfirmed) {
+          const orders = getOrders();
+          orders.splice(index, 1);
+          saveOrders(orders);
+          renderOrders();
+        }
+      });
+    }
+
+    function renderOrders() {
+      const root   = document.getElementById('ordersRoot');
+      const orders = getOrders();
+
+      if (!orders.length) {
+        root.innerHTML = `
+          <div class="empty">
+            <p style="margin-bottom:8px;">No tienes pedidos todavía.</p>
+            <p>Agrega productos al <a href="carrito.html" style="color:#06b6d4;font-weight:700;">carrito</a> y confirma tu pago.</p>
+          </div>`;
+        return;
+      }
+
+      root.innerHTML = `
+        <div style="overflow-x:auto;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th># Pedido</th><th>Fecha</th><th>Productos</th><th>Total</th><th>Estado</th><th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${orders.map((o, i) => {
+                const itemsHtml = Array.isArray(o.items) && o.items.length
+                  ? `<div class="detail-list">${o.items.map(it => `${it.name || 'Producto'} ×${it.qty || 1}`).join(' · ')}</div>`
+                  : '<span style="color:#94a3b8;">—</span>';
+                return `
+                  <tr>
+                    <td style="font-weight:800; color:#0f172a;">${o.orderNumber || '—'}</td>
+                    <td>${formatDate(o.dateISO || o.date || '')}</td>
+                    <td>${itemsHtml}</td>
+                    <td style="font-weight:700;">${formatMXN(o.total)}</td>
+                    <td>
+                      <select class="status-select ${statusClass(o.status)}" data-order-index="${i}" onchange="changeStatus(${i}, this.value)">
+                        <option value="Pendiente"  ${o.status === 'Pendiente'  ? 'selected' : ''}>⏳ Pendiente</option>
+                        <option value="Pagado"     ${o.status === 'Pagado'     ? 'selected' : ''}>✅ Pagado</option>
+                        <option value="En proceso" ${o.status === 'En proceso' ? 'selected' : ''}>🔄 En proceso</option>
+                        <option value="Deuda"      ${o.status === 'Deuda'      ? 'selected' : ''}>⚠️ Deuda</option>
+                      </select>
+                    </td>
+                    <td><button class="btn-del" onclick="deleteOrder(${i})" title="Eliminar pedido">✕</button></td>
+                  </tr>`;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const menuBtn = document.getElementById('menuBtn');
+      const menuNav = document.getElementById('menuNav');
+      if (menuBtn && menuNav) {
+        menuBtn.addEventListener('click', () => menuNav.classList.toggle('hidden'));
+        menuNav.querySelectorAll('a').forEach(l => l.addEventListener('click', () => menuNav.classList.add('hidden')));
+      }
+
+      document.getElementById('cartIconDesktop')?.addEventListener('click', () => window.location.href = 'carrito.html');
+      document.getElementById('cartIconMobile')?.addEventListener('click',  () => window.location.href = 'carrito.html');
+
+      updateBadge();
+      renderOrders();
+
+      document.getElementById('clearOrders').addEventListener('click', () => {
+        Swal.fire({
+          title: '¿Borrar todos los pedidos?', icon: 'warning',
+          showCancelButton: true, confirmButtonText: 'Sí, borrar', cancelButtonText: 'Cancelar',
+          confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b',
+        }).then(r => {
+          if (r.isConfirmed) {
+            localStorage.removeItem(ORDERS_KEY);
+            renderOrders();
+            Swal.fire({ title:'Pedidos borrados', icon:'info', timer:1200, showConfirmButton:false });
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AluVidrios | Elegancia en Vidrio y Aluminio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+    <div id="app">
+
+        <!-- NAVBAR -->
+        <nav class="fixed w-full z-50 py-4 px-6 md:px-12 flex justify-between items-center bg-[#0d1b3e] text-white shadow-xl">
+            <div class="flex items-center gap-2">
+                <div class="logo-box">AV</div>
+                <span class="text-2xl font-bold tracking-tighter uppercase">AluVidrios</span>
+            </div>
+            <div class="hidden md:flex gap-8 font-medium text-sm tracking-widest uppercase">
+                <a href="../index.html" class="hover:text-cyan-400 transition" style="color:cyan;">Inicio</a>
+                <a href="../productos.html" class="hover:text-cyan-400 transition" style="color:white;">Productos</a>
+                <a href="../servicios.html" class="hover:text-cyan-400 transition" style="color:white;">Servicios</a>
+                <a href="../contacto.html" class="hover:text-cyan-400 transition" style="color:white;">Contacto</a>
+            </div>
+            <div class="flex items-center gap-5">
+                <div class="relative cursor-pointer" onclick="irAlCarrito()">
+    <i data-lucide="shopping-cart" style="color:white;"></i>
+    <span class="cart-badge" id="cartBadge">0</span>
+</div>
+<script>
+    function irAlCarrito() {
+    const usuario = localStorage.getItem('usuario');
+
+    if (!usuario) {
+        Swal.fire({
+            title: '¡Inicia sesión!',
+            text: 'Necesitas iniciar sesión para ver tu carrito.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#22d3ee',
+            cancelButtonColor: '#475569',
+            confirmButtonText: 'Iniciar sesión',
+            cancelButtonText: 'Cancelar',
+            background: '#ffffff',
+            color: '#0d1b3e'
+        }).then(result => {
+            if (result.isConfirmed) {
+                window.location.href = 'is.html';
+            }
+        });
+        return;
+    }
+
+    window.location.href = 'PERFIL CLIENTE/carrito.html';
+}
+</script>
+                <button onclick="window.location.href='../is.html'" class="btn-login" style="color:white;">Acceder</button>
+            </div>
+        </nav>
+
+        <!-- HERO -->
+        <header class="hero-section">
+            <div class="relative z-20 text-center px-6 max-w-5xl animate-up">
+                <div class="glass-container">
+                    <h1 class="hero-title">
+                        Transformamos tus espacios con <span style="color:#22d3ee;">elegancia</span>
+                    </h1>
+                    <p class="hero-subtitle">
+                        Soluciones premium en vidrio templado y aluminio para arquitectura moderna y residencial.
+                    </p>
+                    <div class="flex flex-col md:flex-row gap-4 justify-center">
+                        <a href="productos.html">
+                            <button class="btn-primary">Ver Productos</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- PRODUCTOS -->
+        <section id="productos" class="py-20 bg-white px-6">
+            <div class="max-w-7xl mx-auto text-center mb-16">
+                <h2 class="text-4xl font-bold text-slate-800">Productos Destacados</h2>
+                <div class="w-20 h-1 bg-cyan-500 mx-auto mt-4"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+
+                <!-- Card 1 -->
+                <div class="product-card">
+                    <div class="sketchfab-card-wrap">
+                        <iframe title="3D MOVIEMIENTO ALG75" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking"
+                            src="https://sketchfab.com/models/b462c288ea00425fb4e7d953ae4ca746/embed?autospin=1&ui_infos=0&ui_controls=0&ui_watermark=0"></iframe>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-2 text-slate-800">Serie ALG 75 Máxima</h3>
+                        <p class="text-cyan-600 font-bold text-lg mb-4">$1,000.00</p>
+                        <button onclick="agregarAlCarrito('Serie ALG 75 Máxima', 1000)"
+                            class="w-full bg-slate-800 text-white py-2 rounded hover:bg-cyan-600 transition">
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="product-card">
+                    <div class="sketchfab-card-wrap">
+                        <iframe title="Barandal de Vidrio Templado B" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking"
+                            src="https://sketchfab.com/models/c1e66b28ac2242df850fb3925eef14a1/embed?autospin=1&ui_infos=0&ui_controls=0&ui_watermark=0"></iframe>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-2 text-slate-800">Barandal Vidrio Templado B</h3>
+                        <p class="text-cyan-600 font-bold text-lg mb-4">$10,000.00</p>
+                        <button onclick="agregarAlCarrito('Barandal Vidrio Templado B', 10000)"
+                            class="w-full bg-slate-800 text-white py-2 rounded hover:bg-cyan-600 transition">
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="product-card">
+                    <div class="sketchfab-card-wrap">
+                        <iframe title="Barandal de Vidrio" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking"
+                            src="https://sketchfab.com/models/bfde074f6d23416cafe6d7c7647b6637/embed?autospin=1&ui_infos=0&ui_controls=0&ui_watermark=0"></iframe>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="font-bold text-xl mb-2 text-slate-800">Barandal de Vidrio</h3>
+                        <p class="text-cyan-600 font-bold text-lg mb-4">$20,000.00</p>
+                        <button onclick="agregarAlCarrito('Barandal de Vidrio', 20000)"
+                            class="w-full bg-slate-800 text-white py-2 rounded hover:bg-cyan-600 transition">
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SERVICIOS -->
+        <section id="servicios" class="py-20 bg-slate-900 text-white px-6">
+            <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h2 class="text-4xl font-bold mb-8">Servicios Personalizados</h2>
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <i data-lucide="layers" class="text-cyan-400 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-xl">Puertas y Fachadas</h4>
+                                <p class="text-gray-400">Diseño a medida para entradas principales y locales comerciales.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-4">
+                            <i data-lucide="layout" class="text-cyan-400 mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-xl">Barandales de Cristal</h4>
+                                <p class="text-gray-400">Seguridad y visibilidad total para escaleras y balcones.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <br><br>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <a href="PERFIL CLIENTE/agendar.html">
+                            <button class="btn-primary">Agendar Visita</button>
+                        </a>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="rounded-lg overflow-hidden mt-10 shadow-2xl sketchfab-card-wrap">
+                        <iframe title="Barandal de Vidrio Templado" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking"
+                            src="https://sketchfab.com/models/47ea5cf5694b4efe8469bf4456db674d/embed?autospin=1&ui_infos=0&ui_controls=0&ui_watermark=0"></iframe>
+                    </div>
+                    <div class="rounded-lg overflow-hidden shadow-2xl sketchfab-card-wrap">
+                        <iframe title="Barandal / Railing" frameborder="0" allowfullscreen mozallowfullscreen="true" webkitallowfullscreen="true" allow="autoplay; fullscreen; xr-spatial-tracking"
+                            src="https://sketchfab.com/models/f766553cdf22480abbe9a4adcee35ac6/embed?autospin=1&ui_infos=0&ui_controls=0&ui_watermark=0"></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACTO -->
+        <section id="contacto" class="py-20 bg-white px-6">
+            <div class="max-w-7xl mx-auto text-center">
+                <h2 class="text-4xl font-bold text-slate-800 mb-4">Contáctanos</h2>
+                <div class="w-20 h-1 bg-cyan-500 mx-auto mb-10"></div>
+                <p class="text-gray-500 mb-6">¿Tienes un proyecto en mente? Escríbenos y con gusto te asesoramos.</p>
+                <a href="mailto:contacto@aluvidrios.com" class="btn-login inline-block" style="color:rgb(38, 7, 68); text-decoration:none;">Enviar Mensaje</a>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="bg-slate-950 text-gray-400 py-12 px-6">
+            <div class="max-w-7xl mx-auto text-center">
+                <div class="flex justify-center mb-6">
+                    <div class="logo-box">AV</div>
+                </div>
+                <p class="mb-8 italic">"Calidad que se nota, transparencia que enamora."</p>
+                <div class="flex justify-center gap-6 mb-8 text-sm uppercase tracking-widest">
+                    <a href="#" class="hover:text-white">Facebook</a>
+                    <a href="#" class="hover:text-white">Instagram</a>
+                    <a href="#" class="hover:text-white">WhatsApp</a>
+                </div>
+                <p class="text-xs">© 2024 AluVidrios. Todos los derechos reservados.</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        function agregarAlCarrito(nombre, precio) {
+            const usuario = localStorage.getItem('usuario');
+
+            if (!usuario) {
+                Swal.fire({
+                    title: '¡Inicia sesión!',
+                    text: 'Necesitas iniciar sesión para agregar productos al carrito.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#22d3ee',
+                    cancelButtonColor: '#475569',
+                    confirmButtonText: 'Iniciar sesión',
+                    cancelButtonText: 'Cancelar',
+                    background: '#ffffff',
+                    color: '#0d1b3e'
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        window.location.href = 'is.html';
+                    }
+                });
+                return;
+            }
+
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const existe = cart.find(p => p.nombre === nombre);
+            if (existe) {
+                existe.qty = (existe.qty || 1) + 1;
+            } else {
+                cart.push({ nombre, precio, qty: 1 });
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+
+            Swal.fire({
+                icon: 'success',
+                title: '¡Agregado!',
+                text: `${nombre} se agregó al carrito.`,
+                confirmButtonColor: '#22d3ee',
+                confirmButtonText: 'Ver carrito',
+                showCancelButton: true,
+                cancelButtonText: 'Seguir comprando',
+                background: '#ffffff',
+                color: '#0d1b3e'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    window.location.href = 'PERFIL CLIENTE/carrito.html';
+                }
+            });
+        }
+
+        const { createApp, ref, onMounted } = Vue;
+        createApp({
+            setup() {
+                const scrolled = ref(false);
+                onMounted(() => {
+                    window.addEventListener('scroll', () => { scrolled.value = window.scrollY > 50; });
+                    lucide.createIcons();
+                });
+                return { scrolled };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

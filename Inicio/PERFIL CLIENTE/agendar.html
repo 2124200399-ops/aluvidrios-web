@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AluVidrios | Agendar Visita</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="agendarcliente.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <style>
+    .nav-wrapper { display:flex; align-items:center; justify-content:space-between; width:100%; position:relative; }
+    .nav-logo    { flex:1; display:flex; align-items:center; gap:10px; }
+    .nav-links   { position:absolute; left:50%; transform:translateX(-50%); display:flex; align-items:center; gap:32px; }
+    .nav-actions { flex:1; display:flex; align-items:center; justify-content:flex-end; gap:20px; }
+    .logo-box { background:linear-gradient(135deg,#06b6d4,#3b82f6); color:#fff; font-weight:900; padding:6px 10px; border-radius:8px; font-size:14px; }
+    .btn-login { border:2px solid #06b6d4; color:#06b6d4 !important; background:transparent; padding:6px 18px; border-radius:8px; font-weight:700; cursor:pointer; transition:.2s; }
+    .btn-login:hover { background:#06b6d4; color:#fff !important; }
+    .cart-badge { position:absolute; top:-8px; right:-10px; background:#ef4444; color:#fff; border-radius:999px; font-size:11px; font-weight:800; padding:1px 6px; }
+  </style>
+</head>
+
+<body class="bg-slate-950">
+  <div id="app">
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 py-4 px-6 md:px-12 flex justify-between items-center bg-[#0d1b3e] text-white shadow-xl">
+    <div class="flex items-center gap-2">
+        <div class="logo-box">AV</div>
+        <span class="text-2xl font-bold tracking-tighter uppercase">AluVidrios</span>
+    </div>
+    <div class="hidden md:flex gap-8 font-medium text-sm tracking-widest uppercase">
+        <a href="indexcliente.html"     class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Inicio</a>
+        <a href="productoscliente.html" class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Productos</a>
+        <a href="servicioscliente.html" class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Servicios</a>
+        <a href="contactocliente.html"  class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Contacto</a>
+        <a href="pedidos.html"   class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Pedidos</a>
+        <a href="citas.html"   class="hover:text-cyan-400 transition font-medium tracking-widest uppercase text-sm py-2" style="color:white;">Citas
+        </a>
+    </div>
+    <div class="flex items-center gap-5">
+    <div class="relative cursor-pointer" onclick="window.location.href='carrito.html'">
+        <i data-lucide="shopping-cart" style="color:white;"></i>
+        <span class="cart-badge" id="cartBadge">0</span>
+    </div>
+        <button onclick="cerrarSesion()" class="btn-login" style="color:white;">Cerrar Sesión</button>
+    </div>
+</nav>
+
+    <!-- FORMULARIO -->
+    <main class="agendar-page">
+      <div class="agendar-card">
+        <h1 class="agendar-title">Agendar visita</h1>
+        <p class="agendar-subtitle">
+          Completa tus datos para programar una visita a domicilio. Tu solicitud llegará directamente a AluVidrios.
+        </p>
+
+        <form id="visitForm">
+          <div class="form-grid">
+
+            <div class="field">
+              <label for="nombre">Nombre completo</label>
+              <input id="nombre" class="input" type="text" required placeholder="Ej. Aura Hernández" />
+            </div>
+
+            <div class="field">
+              <label for="telefono">Teléfono / WhatsApp</label>
+              <input id="telefono" class="input" type="tel" required placeholder="Ej. 55 1234 5678" />
+              <div class="hint">Para confirmar la visita y resolver dudas.</div>
+            </div>
+
+            <div class="field col-span-2">
+              <label for="emailCliente">Correo (opcional)</label>
+              <input id="emailCliente" class="input" type="email" placeholder="Ej. daniela@gmail.com" />
+            </div>
+
+            <div class="field col-span-2">
+              <label for="direccion">Dirección completa</label>
+              <input id="direccion" class="input" type="text" required
+                     placeholder="Ej. Calle 5 #123, entre X y Y, casa color blanco" />
+              <div class="hint">Entre más referencias, más fácil llegar.</div>
+            </div>
+
+            <div class="field">
+              <label for="calle">Calle</label>
+              <input id="calle" class="input" type="text" required placeholder="Ej. Av. Reforma" />
+            </div>
+
+            <div class="field">
+              <label for="colonia">Colonia</label>
+              <input id="colonia" class="input" type="text" required placeholder="Ej. Centro" />
+            </div>
+
+            <div class="field">
+              <label for="ciudad">Ciudad / Municipio</label>
+              <input id="ciudad" class="input" type="text" required placeholder="Ej. CDMX / Ecatepec" />
+            </div>
+
+            <div class="field">
+              <label for="cp">Código Postal</label>
+              <input id="cp" class="input" type="text" inputmode="numeric" required placeholder="Ej. 06000" />
+            </div>
+
+            <div class="field">
+              <label for="fecha">Fecha preferida</label>
+              <input id="fecha" class="input" type="date" required />
+            </div>
+
+            <div class="field">
+              <label for="hora">Hora preferida</label>
+              <input id="hora" class="input" type="time" required />
+            </div>
+
+            <div class="field col-span-2">
+              <label for="rangoHorario">Rango de horario (opcional)</label>
+              <select id="rangoHorario" class="select">
+                <option value="">Selecciona una opción</option>
+                <option value="Mañana (9:00 - 12:00)">Mañana (9:00 - 12:00)</option>
+                <option value="Mediodía (12:00 - 15:00)">Mediodía (12:00 - 15:00)</option>
+                <option value="Tarde (15:00 - 19:00)">Tarde (15:00 - 19:00)</option>
+              </select>
+              <div class="hint">Si no puedes una hora exacta, elige un rango.</div>
+            </div>
+
+            <div class="field col-span-2">
+              <label for="tipoServicio">Tipo de servicio (opcional)</label>
+              <select id="tipoServicio" class="select">
+                <option value="">Selecciona una opción</option>
+                <option value="Cancel de baño">Cancel de baño</option>
+                <option value="Ventanas / Cancelaría de aluminio">Ventanas / Cancelaría de aluminio</option>
+                <option value="Barandal de vidrio">Barandal de vidrio</option>
+                <option value="Puertas / Fachadas">Puertas / Fachadas</option>
+                <option value="Reparación / Mantenimiento">Reparación / Mantenimiento</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+
+            <div class="field col-span-2">
+              <label for="descripcion">Descripción del servicio</label>
+              <textarea id="descripcion" class="textarea" required
+                placeholder="Ej. Quiero cotizar un cancel de baño. Medidas aproximadas 1.20m x 1.80m."></textarea>
+            </div>
+
+            <div class="field col-span-2">
+              <label for="medidas">Medidas aproximadas (opcional)</label>
+              <input id="medidas" class="input" type="text" placeholder="Ej. 2.00m ancho x 1.10m alto" />
+            </div>
+
+            <div class="field col-span-2">
+              <label for="observaciones">Observaciones / Acceso (opcional)</label>
+              <textarea id="observaciones" class="textarea"
+                placeholder="Ej. Portón negro, tocar timbre 2, hay perro, estacionamiento enfrente, etc."></textarea>
+            </div>
+
+            <div class="field col-span-2">
+              <div class="actions">
+                <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+                <a href="servicioscliente.html" class="btn btn-secondary">Volver a servicios</a>
+              </div>
+              <div class="note">Tu solicitud se enviará directamente a AluVidrios.</div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+    </main>
+
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script>
+    function cerrarSesion() {
+      Swal.fire({
+        title: '¿Cerrar sesión?',
+        text: 'Se cerrará tu sesión de cliente',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#22d3ee',
+        cancelButtonColor: '#475569',
+        confirmButtonText: 'Sí, salir',
+        cancelButtonText: 'Cancelar',
+        background: '#0d1b3e',
+        color: '#ffffff'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.removeItem('usuario');
+          window.location.href = '../index.html';
+        }
+      });
+    }
+
+    const { createApp, ref, onMounted } = Vue;
+    createApp({
+      setup() {
+        const scrolled = ref(false);
+        onMounted(() => {
+          window.addEventListener('scroll', () => { scrolled.value = window.scrollY > 50; });
+          lucide.createIcons();
+        });
+        return { scrolled };
+      }
+    }).mount('#app');
+  </script>
+
+  <script>
+    function updateBadge() {
+      const cart  = JSON.parse(localStorage.getItem('cart') || '[]');
+      const total = cart.reduce((s, i) => s + (Number(i.qty) || 1), 0);
+      document.querySelectorAll('.cart-badge').forEach(b => b.textContent = total);
+    }
+
+    function setMinDateToday() {
+      const fechaEl = document.getElementById('fecha');
+      if (!fechaEl) return;
+      const today = new Date();
+      const yyyy  = today.getFullYear();
+      const mm    = String(today.getMonth() + 1).padStart(2, '0');
+      const dd    = String(today.getDate()).padStart(2, '0');
+      fechaEl.min = `${yyyy}-${mm}-${dd}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const menuBtn = document.getElementById('menuBtn');
+      const menuNav = document.getElementById('menuNav');
+      if (menuBtn && menuNav) {
+        menuBtn.addEventListener('click', () => menuNav.classList.toggle('hidden'));
+        menuNav.querySelectorAll('a').forEach(l => l.addEventListener('click', () => menuNav.classList.add('hidden')));
+      }
+
+      document.getElementById('cartIconDesktop')?.addEventListener('click', () => window.location.href = 'carrito.html');
+      document.getElementById('cartIconMobile')?.addEventListener('click',  () => window.location.href = 'carrito.html');
+
+      updateBadge();
+      setMinDateToday();
+
+      document.getElementById('visitForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = {
+          nombre:        document.getElementById('nombre').value.trim(),
+          telefono:      document.getElementById('telefono').value.trim(),
+          emailCliente:  document.getElementById('emailCliente').value.trim(),
+          direccion:     document.getElementById('direccion').value.trim(),
+          calle:         document.getElementById('calle').value.trim(),
+          colonia:       document.getElementById('colonia').value.trim(),
+          ciudad:        document.getElementById('ciudad').value.trim(),
+          cp:            document.getElementById('cp').value.trim(),
+          fecha:         document.getElementById('fecha').value,
+          hora:          document.getElementById('hora').value,
+          rangoHorario:  document.getElementById('rangoHorario').value,
+          tipoServicio:  document.getElementById('tipoServicio').value,
+          descripcion:   document.getElementById('descripcion').value.trim(),
+          medidas:       document.getElementById('medidas').value.trim(),
+          observaciones: document.getElementById('observaciones').value.trim(),
+        };
+
+        if (!data.nombre || !data.telefono || !data.direccion || !data.calle || !data.colonia || !data.ciudad || !data.cp || !data.fecha || !data.hora || !data.descripcion) {
+          Swal.fire({ title:'Faltan datos', text:'Por favor completa los campos obligatorios.', icon:'warning', confirmButtonColor:'#22d3ee' });
+          return;
+        }
+
+        Swal.fire({
+          title: '¿Enviar solicitud?',
+          text: 'Se enviará tu solicitud de visita a AluVidrios.',
+          icon: 'question',
+          confirmButtonText: 'Sí, enviar',
+          confirmButtonColor: '#22d3ee',
+          showCancelButton: true,
+          cancelButtonText: 'Cancelar',
+          cancelButtonColor: '#0d1b3e'
+        }).then(async result => {
+          if (!result.isConfirmed) return;
+
+          try {
+            const res  = await fetch('/api/enviar_correo.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+            const resp = await res.json();
+
+            if (resp.ok) {
+              Swal.fire({
+                icon: 'success',
+                title: '¡Cita enviada!',
+                text: 'Recibimos tu solicitud, nos pondremos en contacto pronto.',
+                confirmButtonColor: '#22d3ee'
+              });
+              document.getElementById('visitForm').reset();
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Error al enviar',
+                text: resp.error || 'Intenta de nuevo.',
+                confirmButtonColor: '#22d3ee'
+              });
+            }
+          } catch(e) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error de conexión',
+              text: 'No se pudo conectar al servidor.',
+              confirmButtonColor: '#22d3ee'
+            });
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

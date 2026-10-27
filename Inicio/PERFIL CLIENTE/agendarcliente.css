@@ -1,0 +1,210 @@
+/* agendar.css */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+
+body{
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: #0f172a;
+}
+
+/* ====== Fondo y layout ====== */
+.agendar-page{
+  min-height: 100vh;
+  padding-top: 110px; /* navbar fixed */
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 64px;
+
+  background:
+    radial-gradient(900px 300px at 20% 10%, rgba(34,211,238,.20), transparent 60%),
+    radial-gradient(700px 300px at 80% 0%, rgba(59,130,246,.18), transparent 55%),
+    linear-gradient(180deg, #0b1226 0%, #060a18 100%);
+}
+
+/* ====== Tarjeta ====== */
+.agendar-card{
+  width: 100%;
+  max-width: 920px;
+  margin: 0 auto;
+
+  background: rgba(255,255,255,.96);
+  border: 1px solid rgba(148,163,184,.35);
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.35);
+
+  padding: 22px;
+}
+
+@media (min-width: 768px){
+  .agendar-card{ padding: 36px; }
+}
+
+.agendar-title{
+  margin: 0 0 6px 0;
+  font-size: 32px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.agendar-subtitle{
+  margin: 0 0 22px 0;
+  color: #475569;
+  font-size: 14px;
+}
+
+/* ====== Form ====== */
+.form-grid{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+@media (min-width: 768px){
+  .form-grid{
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .col-span-2{ grid-column: span 2; }
+}
+
+.field{
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field label{
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.input, .textarea, .select{
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 12px 12px;
+  background: #fff;
+  color: #0f172a;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s, transform .05s;
+}
+
+.textarea{ min-height: 110px; resize: vertical; }
+
+.input:focus, .textarea:focus, .select:focus{
+  border-color: rgba(34,211,238,.9);
+  box-shadow: 0 0 0 4px rgba(34,211,238,.18);
+}
+
+.hint{
+  margin-top: -2px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* ====== Acciones ====== */
+.actions{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+@media (min-width: 640px){
+  .actions{ flex-direction: row; align-items: center; }
+}
+
+.btn{
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: transform .05s ease, filter .2s ease, box-shadow .2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn:active{ transform: scale(.98); }
+
+.btn-primary{
+  background: linear-gradient(90deg, #22d3ee 0%, #38bdf8 55%, #60a5fa 100%);
+  color: #07101f;
+  box-shadow: 0 14px 35px rgba(34,211,238,.25);
+}
+
+.btn-primary:hover{ filter: brightness(1.03); }
+
+.btn-secondary{
+  background: #0d1b3e;
+  color: #ffffff;
+  box-shadow: 0 14px 30px rgba(13,27,62,.25);
+}
+
+.btn-secondary:hover{ filter: brightness(1.08); }
+
+.note{
+  margin-top: 14px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* ══════════════════════════════════════════════════════════
+   NAVBAR ANIMACIONES (de styles.css)
+   ══════════════════════════════════════════════════════════ */
+
+nav a {
+    position: relative;
+    font-size: .85rem;
+    letter-spacing: .08em;
+    transition: color .25s ease;
+}
+
+nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 2px;
+    background: #22d3ee;
+    border-radius: 999px;
+    transition: width .25s ease;
+}
+
+nav a:hover { color: #22d3ee !important; }
+nav a:hover::after { width: 100%; }
+
+.nav-active-link { color: #22d3ee !important; }
+.nav-active-link::after { width: 100% !important; }
+
+/* Logo hover */
+.logo-box {
+    transition: transform .25s ease, box-shadow .25s ease;
+}
+.logo-box:hover {
+    transform: rotate(0deg) scale(1.05);
+    box-shadow: 0 6px 28px rgba(34,211,238,.4);
+}
+
+/* Btn login hover mejorado */
+.btn-login {
+    transition: background .25s ease, color .25s ease, box-shadow .25s ease;
+}
+.btn-login:hover {
+    background: #22d3ee;
+    color: #0f172a !important;
+    box-shadow: 0 4px 20px rgba(34,211,238,.25);
+}
+
+/* Cart badge pulse */
+@keyframes pulse-cyan {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34,211,238,.4); }
+    50%       { box-shadow: 0 0 0 8px rgba(34,211,238,0); }
+}
+.cart-badge { animation: pulse-cyan 2s infinite; }

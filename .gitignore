@@ -1,0 +1,27 @@
+# Dependencies
+**/node_modules/
+**/vendor/
+
+# Environment and sensitive keys
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Logs and debug
+*.log
+logs/
+
+# Build and dist
+dist/
+dist-ssr/
+build/
+
+# Editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store

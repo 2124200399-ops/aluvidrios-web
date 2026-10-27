@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AluVidrios | Acceder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #060e23; min-height: 100vh; }
+
+        .login-section {
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 2rem 1.5rem;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(34,211,238,0.07) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 20%, rgba(34,211,238,0.05) 0%, transparent 50%),
+                linear-gradient(135deg, #060e23 0%, #0d1b3e 50%, #091630 100%);
+            position: relative; overflow: hidden;
+        }
+
+        .login-card {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(34,211,238,0.18);
+            border-radius: 1.5rem; padding: 2.75rem 2.5rem;
+            width: 100%; max-width: 440px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            position: relative; z-index: 1;
+        }
+
+        .login-card::before {
+            content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+            background: linear-gradient(90deg, transparent, #22d3ee, transparent);
+            opacity: 0.6;
+        }
+
+        .input-field {
+            width: 100%; padding: 0.85rem 1rem 0.85rem 2.8rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.75rem; color: white; outline: none; transition: 0.3s;
+            font-size: 0.95rem;
+        }
+        .input-field:focus { border-color: #22d3ee; background: rgba(34,211,238,0.06); box-shadow: 0 0 0 3px rgba(34,211,238,0.12); }
+        .input-field::placeholder { color: rgba(255,255,255,0.3); }
+        .input-field:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .input-wrapper { position: relative; }
+        .input-icon { position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: #22d3ee; opacity: 0.6; width: 18px; height: 18px; pointer-events: none; }
+
+        .toggle-pass { position: absolute; right: 0.85rem; top: 50%; transform: translateY(-50%); cursor: pointer; color: rgba(255,255,255,0.3); width: 18px; height: 18px; transition: color 0.2s; }
+        .toggle-pass:hover { color: #22d3ee; }
+
+        .alert-error, .alert-success {
+            border-radius: 0.75rem; padding: 0.9rem 1rem;
+            font-size: 0.875rem; display: none; align-items: flex-start; gap: 0.6rem;
+        }
+        .alert-error  { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.35);  color: #fca5a5; }
+        .alert-success{ background: rgba(34,211,238,0.08); border: 1px solid rgba(34,211,238,0.3);  color: #22d3ee; }
+        .show { display: flex !important; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .shake { animation: shake 0.4s ease; }
+
+        .google-btn-wrapper { display: flex; justify-content: center; width: 100%; }
+
+        @media (max-width: 480px) {
+            .login-card { padding: 1.75rem 1.25rem; }
+            .input-field { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<section class="login-section">
+    <div class="login-card">
+
+        <!-- Logo -->
+        <div class="flex flex-col items-center mb-8">
+            <div class="bg-cyan-500 text-slate-900 font-bold px-3 py-2 rounded-lg text-lg mb-4"
+                 style="transform: rotate(-8deg); box-shadow: 0 4px 15px rgba(34,211,238,0.4);">AV</div>
+            <h1 class="text-2xl font-extrabold text-white tracking-tight">Bienvenido de vuelta</h1>
+            <p class="text-gray-400 text-sm mt-1">Ingresa tus credenciales para continuar</p>
+        </div>
+
+        <!-- Alerta error -->
+        <div id="alertError" class="alert-error mb-5">
+            <i data-lucide="alert-circle" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;"></i>
+            <div>
+                <p class="font-semibold">Credenciales incorrectas</p>
+                <p style="color:rgba(252,165,165,0.85); margin-top:2px;" id="errorMsg">
+                    Usuario o contraseña no válidos.
+                </p>
+            </div>
+        </div>
+
+        <!-- Alerta éxito -->
+        <div id="alertSuccess" class="alert-success mb-5">
+            <i data-lucide="check-circle-2" style="width:18px;height:18px;flex-shrink:0;margin-top:2px;"></i>
+            <p id="successMsg">¡Éxito! Redirigiendo...</p>
+        </div>
+
+        <!-- Formulario -->
+        <form id="loginForm" novalidate>
+            <div class="mb-4">
+                <label class="block text-sm font-semibold mb-2" style="color:rgba(255,255,255,0.7);">Usuario o Correo</label>
+                <div class="input-wrapper">
+                    <i data-lucide="user" class="input-icon"></i>
+                    <input id="inputUser" type="text" class="input-field" placeholder="Ingresa tu usuario o correo">
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-semibold mb-2" style="color:rgba(255,255,255,0.7);">Contraseña</label>
+                <div class="input-wrapper">
+                    <i data-lucide="lock" class="input-icon"></i>
+                    <input id="inputPass" type="password" class="input-field" placeholder="Ingresa tu contraseña">
+                    <i data-lucide="eye" class="toggle-pass" id="togglePass"></i>
+                </div>
+            </div>
+
+            <button type="submit" id="btnSubmit"
+                class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-bold py-3 rounded-xl transition flex justify-center items-center gap-2">
+                <i data-lucide="log-in" style="width:18px;height:18px;"></i>
+                Iniciar Sesión
+            </button>
+        </form>
+
+        <!-- Divisor -->
+        <div class="flex items-center gap-3 my-6">
+            <div class="flex-1 h-px" style="background:rgba(255,255,255,0.08);"></div>
+            <span class="text-xs" style="color:rgba(255,255,255,0.25);">o continúa con Google</span>
+            <div class="flex-1 h-px" style="background:rgba(255,255,255,0.08);"></div>
+        </div>
+
+        <!-- Botón Google -->
+        <div class="google-btn-wrapper">
+            <div id="g_id_onload"
+                 data-client_id="875136009784-kog1pvgut6vgfnv3mnv60afr99frg308.apps.googleusercontent.com"
+                 data-callback="handleGoogleLogin"
+                 data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-size="large"
+                 data-theme="outline"
+                 data-text="signin_with"
+                 data-shape="rectangular"
+                 data-logo_alignment="left"
+                 data-width="360">
+            </div>
+        </div>
+
+        <!-- Volver -->
+        <a href="index.html"
+           class="flex items-center justify-center gap-2 w-full py-3 mt-6 rounded-xl text-sm font-semibold transition"
+           style="border:1px solid rgba(255,255,255,0.1); color:rgba(255,255,255,0.55); text-decoration:none;"
+           onmouseover="this.style.borderColor='rgba(34,211,238,0.4)';this.style.color='#22d3ee';"
+           onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.55)';">
+            <i data-lucide="arrow-left" style="width:16px;height:16px;"></i>
+            Volver al inicio
+        </a>
+
+    </div>
+</section>
+
+<script>
+    lucide.createIcons();
+
+    const VALID_USER = 'admin';
+    const VALID_PASS = 'admin123';
+
+    const form         = document.getElementById('loginForm');
+    const inputUser    = document.getElementById('inputUser');
+    const inputPass    = document.getElementById('inputPass');
+    const alertError   = document.getElementById('alertError');
+    const alertSuccess = document.getElementById('alertSuccess');
+    const btnSubmit    = document.getElementById('btnSubmit');
+    const successMsg   = document.getElementById('successMsg');
+    const errorMsg     = document.getElementById('errorMsg');
+
+    // Toggle contraseña
+    document.getElementById('togglePass').addEventListener('click', () => {
+        const show = inputPass.type === 'password';
+        inputPass.type = show ? 'text' : 'password';
+        document.getElementById('togglePass').setAttribute('data-lucide', show ? 'eye-off' : 'eye');
+        lucide.createIcons();
+    });
+
+    // Login
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertError.classList.remove('show');
+        alertSuccess.classList.remove('show');
+
+        const user = inputUser.value.trim();
+        const pass = inputPass.value;
+
+        if (!user || !pass) {
+            errorMsg.textContent = 'Por favor llena todos los campos.';
+            alertError.classList.add('show');
+            return;
+        }
+
+        if (user === VALID_USER && pass === VALID_PASS) {
+            // ── Admin ──
+            successMsg.textContent = '¡Bienvenido Admin! Redirigiendo al panel...';
+            alertSuccess.classList.add('show');
+            btnSubmit.disabled = true;
+            btnSubmit.style.opacity = '0.5';
+
+            localStorage.setItem('usuario', JSON.stringify({
+                id:     1,
+                nombre: 'Admin',
+                rol:    'admin'
+            }));
+
+            setTimeout(() => {
+                window.location.href = 'PERFIL ADMIN/admin.html';
+            }, 1500);
+
+        } else {
+            // ── Cliente — verificar en BD ──
+            try {
+                const res  = await fetch('/api/login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: user, password: pass })
+                });
+                const data = await res.json();
+
+                if (data.ok) {
+                    successMsg.textContent = `¡Bienvenido ${data.nombre}! Redirigiendo...`;
+                    alertSuccess.classList.add('show');
+                    btnSubmit.disabled = true;
+                    btnSubmit.style.opacity = '0.5';
+
+                    localStorage.setItem('usuario', JSON.stringify({
+                        id:     data.id,
+                        nombre: data.nombre,
+                        email:  data.email,
+                        rol:    data.rol,
+                        foto:   data.foto
+                    }));
+
+                    setTimeout(() => {
+                        window.location.href = 'PERFIL CLIENTE/indexcliente.html';
+                    }, 1500);
+
+                } else {
+                    errorMsg.textContent = 'Usuario o contraseña no válidos.';
+                    alertError.classList.add('show');
+                    const card = document.querySelector('.login-card');
+                    card.classList.add('shake');
+                    card.addEventListener('animationend', () => card.classList.remove('shake'), { once: true });
+                }
+            } catch(e) {
+                errorMsg.textContent = 'Error de conexión con el servidor.';
+                alertError.classList.add('show');
+            }
+        }
+    });
+
+    // Limpiar error al escribir
+    [inputUser, inputPass].forEach(el =>
+        el.addEventListener('input', () => alertError.classList.remove('show'))
+    );
+
+    // Login con Google — ahora guarda el usuario en la BD
+    async function handleGoogleLogin(response) {
+        const base64 = response.credential.split('.')[1];
+        const datos  = JSON.parse(atob(base64));
+
+        try {
+            const res  = await fetch('/api/login_google.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nombre: datos.name,
+                    email:  datos.email,
+                    foto:   datos.picture
+                })
+            });
+            const data = await res.json();
+
+            if (data.ok) {
+                localStorage.setItem('usuario', JSON.stringify({
+                    id:     data.id,
+                    nombre: data.nombre,
+                    email:  data.email,
+                    foto:   data.foto,
+                    rol:    'cliente'
+                }));
+
+                successMsg.textContent = `¡Bienvenido ${data.nombre}! Redirigiendo...`;
+                alertSuccess.classList.add('show');
+
+                setTimeout(() => {
+                    window.location.href = 'PERFIL CLIENTE/indexcliente.html';
+                }, 1500);
+            } else {
+                errorMsg.textContent = data.error || 'Error al iniciar sesión con Google.';
+                alertError.classList.add('show');
+            }
+        } catch(e) {
+            errorMsg.textContent = 'Error al iniciar sesión con Google.';
+            alertError.classList.add('show');
+        }
+    }
+</script>
+
+</body>
+</html>
